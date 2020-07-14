@@ -105,6 +105,7 @@ class ListedProductViewFacade implements ListedProductViewFacadeInterface
      */
     public function getTop(int $limit): array
     {
+        /** @var \App\Model\Product\Product[] $topProducts */
         $topProducts = $this->topProductFacade->getAllOfferedProducts(
             $this->domain->getId(),
             $this->currentCustomerUser->getPricingGroup()
@@ -120,6 +121,7 @@ class ListedProductViewFacade implements ListedProductViewFacadeInterface
      */
     public function getAllTop(): array
     {
+        /** @var \App\Model\Product\Product[] $topProducts */
         $topProducts = $this->topProductFacade->getAllOfferedProducts(
             $this->domain->getId(),
             $this->currentCustomerUser->getPricingGroup()
@@ -137,6 +139,7 @@ class ListedProductViewFacade implements ListedProductViewFacadeInterface
     {
         $product = $this->productFacade->getById($productId);
 
+        /** @var \App\Model\Product\Product[] $accessories */
         $accessories = $this->productAccessoryFacade->getTopOfferedAccessories(
             $product,
             $this->domain->getId(),
@@ -155,6 +158,7 @@ class ListedProductViewFacade implements ListedProductViewFacadeInterface
     {
         $product = $this->productFacade->getById($productId);
 
+        /** @var \App\Model\Product\Product[] $accessories */
         $accessories = $this->productAccessoryFacade->getTopOfferedAccessories(
             $product,
             $this->domain->getId(),
