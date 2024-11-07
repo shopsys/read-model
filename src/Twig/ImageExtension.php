@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Shopsys\ReadModelBundle\Twig;
 
+use Shopsys\FrameworkBundle\Component\Image\Exception\ImageNotFoundException;
+use Shopsys\FrameworkBundle\Component\Image\ImageUrlWithSizeHelper;
 use Shopsys\FrameworkBundle\Twig\ImageExtension as BaseImageExtension;
 use Shopsys\ReadModelBundle\Image\ImageView;
 
@@ -42,24 +44,31 @@ class ImageExtension extends BaseImageExtension
     }
 
     /**
-     * @param \Shopsys\FrameworkBundle\Component\Image\Image|\Shopsys\ReadModelBundle\Image\ImageView|object $imageView
-     * @param string|null $type
+     * @param \Shopsys\FrameworkBundle\Component\Image\Image|\Shopsys\ReadModelBundle\Image\ImageView|object $imageOrEntity
+     * @param array $attributes
      * @return string
      */
-    protected function getImageUrl($imageView, ?string $type = null): string
+    protected function getImageUrl($imageOrEntity, array $attributes): string
     {
-        if ($imageView instanceof ImageView) {
-            $entityName = $imageView->getEntityName();
+        $width = null;
+        $height = null;
 
-            return $this->imageFacade->getImageUrlFromAttributes(
-                $this->domain->getCurrentDomainConfig(),
-                $imageView->getId(),
-                $imageView->getExtension(),
-                $entityName,
-                $type,
-            );
+        if (array_key_exists('width', $attributes)) {
+            $width = (int)$attributes['width'];
         }
 
-        return parent::getImageUrl($imageView, $type);
+        if (array_key_exists('height', $attributes)) {
+            $height = (int)$attributes['height'];
+        }
+
+        try {
+            return ImageUrlWithSizeHelper::limitSizeInImageUrl($this->imageFacade->getImageUrl(
+                $this->domain->getCurrentDomainConfig(),
+                $imageOrEntity,
+                $attributes['type'],
+            ), $width, $height);
+        } catch (ImageNotFoundException $e) {
+            return $this->getEmptyImageUrl();
+        }
     }
 }
